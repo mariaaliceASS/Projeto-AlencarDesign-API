@@ -54,10 +54,10 @@ public class ConsultaController {
 
         if (consultaExistente.isPresent()) {
             ConsultaEntity consulta = consultaExistente.get();
-            consultaAtt.setDataConsulta(consultaAtt.getDataConsulta());
-            consultaAtt.setHoraConsulta(consultaAtt.getHoraConsulta());
-            consultaAtt.setPagamento(consultaAtt.getPagamento());
-            consultaAtt.setTipoProcedimento(consultaAtt.getTipoProcedimento());
+            consulta.setDataConsulta(consultaAtt.getDataConsulta());
+            consulta.setHoraConsulta(consultaAtt.getHoraConsulta());
+            consulta.setPagamento(consultaAtt.getPagamento());
+            consulta.setTipoProcedimento(consultaAtt.getTipoProcedimento());
             
             ConsultaEntity consultaSalva = consultaService.salvar(consulta);
             return ResponseEntity.ok(consultaSalva);

@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Cliente</title>
+    <title>Atualizar Dados Cliente</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css"> <!-- Link para o arquivo CSS -->
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body >
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Alencar Design</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,38 +20,38 @@
             </ul>
         </div>
     </nav>
-    
     <div class="container mt-4 d-flex">
         <div class="col-md-6">
             <h2>Cadastrar Cliente</h2>
-            <form id="cadastrarFilmeForm" onsubmit="cadastrarCliente(event)">
-                <div class="form-group">
+        <form id="updateForm" onsubmit="return false;">
+            <input type="hidden" name="id" id="clienteId" />                
+            
+            <div class="form-group">
                     <label for="nome">Nome:</label>
-                    <input type="text" class="form-control" id="nome" placeholder="Digite o nome">
+                    <input type="text" class="form-control" id="nome" name="nome">
                 </div>
                 <div class="form-group">
                     <label for="cpf">CPF:</label>
-                    <input type="text" class="form-control" id="cpf" placeholder="Ex: XXX.XXX.XXX-XX" maxlength="14">
+                    <input type="text" class="form-control" id="cpf" name="cpf" maxlength="14">
                 </div>
                 <div class="form-group">
                     <label for="numeroTelefone">Número de Telefone:</label>
-                    <input type="text" class="form-control" id="numeroTelefone" placeholder="Exemplo:(XX)9XXXX-XXXX" maxlength="15" oninput="formatarTelefone(this)">
+                    <input type="text" class="form-control" id="numeroTelefone" name="numeroTelefone" maxlength="15" oninput="formatarTelefone(this)" >
                 </div>
                 <div class="form-group">
                     <label for="endereco">Endereço:</label>
-                    <input type="text" class="form-control" id="endereco" placeholder="Digite o endereço">
+                    <input type="text" class="form-control" id="endereco" name="endereco">
                 </div>
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                <button type="submit" class="btn btn-primary" onclick="atualizarCliente(event)">Atualizar Dados</button>
                 
             </form>
             <a href="/listarClientes" class="btn btn-secondary mt-3">Voltar</a>
         </div>               
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script>
-            
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
         document.getElementById('cpf').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, ''); // Remove caracteres não numéricos
             if (value.length <= 11) {
@@ -77,31 +76,61 @@
                 input.value = '';
             }
         }
-        function cadastrarCliente(event) {
-            event.preventDefault(); // Evita o comportamento padrão do formulário
+        $(document).ready(function() {
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            const clienteId = getQueryParam('clienteId');
+
+            $.ajax({
+                url: 'http://localhost:8080/api/clientes/buscar/' + clienteId,
+                type: 'GET',
+                success: function(cliente) {
+                    $('#clienteId').val(cliente.id);
+                    $('#nome').val(cliente.nome);
+                    $('#cpf').val(cliente.cpf);
+                    $('#numeroTelefone').val(cliente.numeroTelefone);
+                    $('#endereco').val(cliente.endereco);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erro ao buscar o cliente:', error);
+                }
+            });
+        });
+
+        function atualizarCliente(event) {
+            event.preventDefault();
+            
+            const clienteId = document.getElementById('clienteId').value; // Captura o ID do cliente
+
             const cliente = {
+                id: clienteId,
                 nome: document.getElementById('nome').value,
                 cpf: document.getElementById('cpf').value,
                 numeroTelefone: document.getElementById('numeroTelefone').value,
                 endereco: document.getElementById('endereco').value
             };
 
-           $.ajax({
-                type:  'POST',
-                url: 'http://localhost:8080/api/clientes/adicionar',
+            $.ajax({
+                type: 'PUT',
+                url: `http://localhost:8080/api/clientes/atualizar/${clienteId}`, // Usando clienteId
                 contentType: 'application/json',
-                dataType : 'json',
+                dataType: 'json',
                 data: JSON.stringify(cliente),
-                
+
                 success: function(response) {
-                    window.location.href = 'listarClientes';  // Redirecionar após sucesso
+                    alert('Cliente atualizado com sucesso!');
+                    window.location.href = 'listarClientes'; // Redirecionar após sucesso
                 },
-                
+
                 error: function() {
-                    alert('Erro ao cadastrar filme. Tente novamente.');
+                    alert('Erro ao atualizar cliente. Tente novamente.');
                 }
             });
         }
     </script>
 </body>
 </html>
+

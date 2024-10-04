@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Consultas do Cliente</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css"> <!-- Link para o arquivo CSS -->
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Alencar Design</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/listarClientes">Clientes</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div id="consultas" class="container mt-4">
+        <table id="clienteConsulta" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>CPF</th>
+                    <th>Número Telefone</th>
+                    <th>endereco</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+
+        <h3>Consulta</h3>
+        
+        <form id="adicionarConsultaForm" onsubmit="manterConsulta(event)">
+            <div class="form-group">
+                <label for="dataConsulta">Data da Consulta:</label>
+                <input type="text" class="form-control" id="dataConsulta" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarData(this)" required/>
+            </div>
+            <div class="form-group">
+                <label for="horaConsulta">Hora da Consulta:</label>
+                <input type="text" class="form-control" id="horaConsulta" placeholder="HH:MM" maxlength="5" oninput="formatarHora(this)"required/>
+            </div>
+            <div class="form-group">
+                <label for="pagamento">Status do Pagamento:</label>
+                <input type="text" class="form-control" id="pagamento" placeholder="Pendente/Pago" required/>
+            </div>
+            <div class="form-group">
+                <label for="tipoProcedimento">Procedimento: </label>
+                <textarea class="form-control" id="tipoProcedimento" required></textarea>
+            </div>
+            <button id="btnAdicionarConsulta" type="submit" class="btn btn-primary">Adicionar Consulta</button>
+            <button id="btnAtualizarConsulta" type="submit" class="btn btn-primary">Atualizar Consulta</button>
+            <button id="btnExcluirConsulta" type="submit" class="btn btn-danger">Excluir Consulta</button>
+        </form>
+
+        <a href="/listarClientes" class="btn btn-secondary mt-3">Voltar</a>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script>
+        function formatarData(input) {
+            // Remove tudo que não é número
+            let data = input.value.replace(/\D/g, '');
+
+            // Aplica a máscara
+            if (data.length >= 2) {
+                data = data.replace(/^(\d{2})(\d+)/, '$1/$2'); // Coloca a barra após o dia
+            }
+            if (data.length >= 5) {
+                data = data.replace(/^(\d{2})\/(\d{2})(\d+)/, '$1/$2/$3'); // Coloca a barra após o mês
+            }
+            input.value = data;
+        }
+        
+        function formatarHora(input) {
+            // Remove tudo que não é número
+            let hora = input.value.replace(/\D/g, '');
+
+            // Aplica a máscara
+            if (hora.length >= 2) {
+                hora = hora.replace(/^(\d{2})(\d+)/, '$1:$2'); // Coloca os dois pontos após as horas
+            }
+            input.value = hora;
+        }
+        function carregarCliente() {
+            // Captura a string de consulta da URL
+            const queryString = window.location.search;
+
+            // Cria uma instância de URLSearchParams
+            const urlParams = new URLSearchParams(queryString);
+
+            // Recupera o valor do parâmetro 'id'
+            const clienteId = urlParams.get('clienteId');
+
+            $.ajax({
+                type: 'GET',
+                url: `http://localhost:8080/api/clientes/buscar/${clienteId}`, // Ajuste se necessário
+                dataType: 'json',
+                success: function(response) {
+                    $('#clienteConsulta tbody').empty(); // Limpa a tabela
+                    const newRow = 
+                        `<tr>
+                            <td>${response.nome}</td>
+                            <td>${response.cpf}</td>
+                            <td>${response.numeroTelefone}</td>
+                            <td>${response.endereco}</td>
+                        </tr>`;
+                    $('#clienteConsulta tbody').append(newRow); // Adiciona a nova linha
+
+                    // Carregar análises do filme
+                    carregarConsultas(clienteId);
+                },
+                error: function() {
+                    alert('Erro ao carregar detalhes do cliente. Tente novamente.');
+                }
+            });
+        }
+        
+        function manterConsulta(event){ 
+            
+            const acao = event.submitter.id;
+            
+            if (acao === "btnAdicionarConsulta" ) {
+                adicionarConsulta(event);
+            } else if (acao === "btnAtualizarConsulta" ) {
+                atualizarConsulta(event);
+            } else if (acao === "btnExcluirConsulta" ) {
+                excluirConsulta(event);
+            } else {
+                alert ('Opção inválida !');
+            }            
+        }
+        
+        function adicionarConsulta(event){
+            event.preventDefault();
+            
+            const clienteId = new URLSearchParams(window.location.search).get('clienteId');
+            
+
+            const consulta = {
+                dataConsulta: document.getElementById('dataConsulta').value, 
+                horaConsulta: document.getElementById('horaConsulta').value, // O valor já está no formato ISO
+                pagamento: document.getElementById('pagamento').value,
+                tipoProcedimento: document.getElementById('tipoProcedimento').value,
+                clienteId: clienteId
+                
+            };
+            
+            $.ajax({
+                type: 'POST',
+                url:`http://localhost:8080/api/consultas/${clienteId}`,
+                contentType:'application/json' ,
+                dataType:'json' ,
+                data: JSON.stringify(consulta),
+                
+                success:function(response){
+                    alert('Consulta cadastrada com sucesso');
+                    carregarConsultas(clienteId);
+                    
+                },
+                error: function() {
+                    alert('Só é possível cadastrar uma consulta. Altere-a!');
+                }
+                
+             });    
+            
+        }
+        
+        function atualizarConsulta(event) {
+            event.preventDefault();
+            const clienteId = new URLSearchParams(window.location.search).get('clienteId');
+
+
+            const consulta = {
+                dataConsulta: document.getElementById('dataConsulta').value, 
+                horaConsulta: document.getElementById('horaConsulta').value, // O valor já está no formato ISO
+                pagamento: document.getElementById('pagamento').value,
+                tipoProcedimento: document.getElementById('tipoProcedimento').value,
+                clienteId: clienteId
+                
+            };
+
+            $.ajax({
+                type: 'PUT',
+                url: `http://localhost:8080/api/consultas/${clienteId}`,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(consulta),
+                success: function(response) {
+                    alert('Consulta atualizada com sucesso!');
+                    carregarConsultas(clienteId);
+                },
+                error: function() {
+                    alert('Erro ao atualizar consulta. Tente novamente.');
+                }
+            });
+        }
+
+        function excluirConsulta(event) {
+            event.preventDefault();
+            const clienteId = new URLSearchParams(window.location.search).get('clienteId');
+
+            $.ajax({
+                type: 'DELETE',
+                url: `http://localhost:8080/api/consultas/${clienteId}`,
+                success: function() {
+                    alert('Consulta excluída com sucesso!');
+                    
+                    $('#dataConsulta').val('');
+                    $('#horaConsulta').val('');
+                    $('#pagamento').val('');
+                    $('#tipoProcedimento').val('');
+
+                    carregarAnalises(clienteId);
+                },
+                error: function() {
+                    alert('Erro ao excluir análise. Tente novamente.');
+                }
+            });        }
+
+        function carregarConsultas(clienteId) {
+
+            $.ajax({
+                type: 'GET',
+                url: `http://localhost:8080/api/consultas/${clienteId}`,
+                
+                success: function(consulta) {
+                    console.log(consulta); //verificar a resposta
+
+                    if (consulta) {
+                        $('#dataConsulta').val(consulta.dataConsulta);
+                        $('#horaConsulta').val(consulta.horaConsulta);
+                        $('#pagamento').val(consulta.pagamento);
+                        $('#tipoProcedimento').val(consulta.tipoProcedimento);
+
+                        $('#btnAdicionarConsulta').hide();
+                        $('#btnAtualizarConsulta').show();
+                        $('#btnExcluirConsulta').show();
+
+                    } else {
+                        $('#btnAdicionarConsulta').show();
+                        $('#btnAtualizarConsulta').hide();
+                        $('#btnExcluirConsulta').hide();
+                    }
+                },
+                error: function() {
+   //                 alert('Erro ao carregar análises. Tente novamente.');
+                    $('#btnAdicionarConsulta').show();
+                    $('#btnAtualizarConsulta').hide();
+                    $('#btnExcluirConsulta').hide();
+                }
+            });
+        }
+
+        // Chama a função ao carregar a página
+        $(document).ready(function() {
+            carregarCliente();
+        });
+    </script>    
+</body>
+</html>

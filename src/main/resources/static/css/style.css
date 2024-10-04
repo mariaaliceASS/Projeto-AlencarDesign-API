@@ -1,0 +1,97 @@
+/* Estilo para o body */
+body {
+    background-color: #E6E6FA; /* Lilás claro */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Estilo para a navbar */
+.navbar {
+    background-color: #9370DB; /* Lilás */
+}
+
+.navbar-brand, .nav-link {
+    color: #4B0082 !important; /* Texto branco */
+}
+
+.nav-link:hover {
+    color: #FFC0CB !important; /* Rosa ao passar o mouse */
+}
+
+.form-control {
+    border-radius: 20px; /* Bordas arredondadas */
+    border: 2px solid #FF69B4; /* Borda rosa */
+    width: 300px; /* Largura */
+    margin: 10px 0; /* Espaçamento vertical entre os campos */
+}
+
+.form-control:focus {
+    border-color: #FF1493; /* Rosa mais escuro ao focar */
+    box-shadow: 0 0 5px rgba(255, 20, 147, 0.5); /* Sombra ao focar */
+}
+
+
+input, textarea {
+    height: 40px; /* Altura dos inputs */
+    padding: 10px; /* Espaçamento interno */
+}
+
+label {
+    font-weight: 500; /* Peso da fonte dos labels */
+}
+
+/* Estilo para a tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white; /* Fundo branco para a tabela */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+th, td {
+    border: 1px solid #ddd; /* Borda mais clara */
+    padding: 15px; /* Aumenta o espaçamento */
+    text-align: left;
+}
+
+th {
+    background-color: #9370DB; /* Cor de fundo das cabeçalhos */
+    color: white; /* Texto branco nos cabeçalhos */
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1; /* Fundo claro ao passar o mouse */
+}
+
+/* Estilo para botões */
+button {
+    background-color: #FF69B4; /* Rosa */
+    color: white; /* Texto branco */
+    border: none; /* Remove borda padrão */
+    padding: 10px 15px; /* Espaçamento interno */
+    border-radius: 10px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor de ponteiro */
+    transition: background-color 0.3s; /* Transição suave */
+}
+
+button:hover {
+    background-color: #FF1493; /* Rosa mais escuro ao passar o mouse */
+}
+
+/* Estilo geral para o contêiner */
+/* Estilo geral para o contêiner */
+.container {
+    max-width: 800px; /* Largura máxima */
+    margin: auto; /* Centraliza horizontalmente */
+    padding: 20px; /* Espaçamento interno */
+    background-color: #E6E6FA; /* Fundo lilás claro */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+/* Margem no título */
+h1 {
+    margin-bottom: 20px; /* Espaço abaixo do título */
+    color: #4B0082; /* Cor do título */
+}

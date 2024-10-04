@@ -26,7 +26,7 @@ public class ConsultaEntity {
     private Long id;
     
     @NotBlank
-    private String dataConsulta; // data consulta
+    private String dataConsulta;
     
     @NotBlank
     private String horaConsulta;
